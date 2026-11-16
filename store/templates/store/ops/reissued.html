@@ -1,0 +1,22 @@
+{% extends "store/ops/base_ops.html" %}
+{% block title %}OPS // New QR{% endblock %}
+{% block ops_content %}
+<div class="max-w-md mx-auto text-center space-y-4">
+  <h1 class="text-xs uppercase tracking-[0.3em] text-blood">[ New QR issued ] REF {{ order.short_ref }} &middot; {{ order.full_name }}</h1>
+  <div class="bg-white p-4 w-fit mx-auto"><div id="qr"></div></div>
+  <p class="text-sm"><strong class="text-blood">Shown only once.</strong> Screenshot it and send it to the customer privately (Instagram DM). The old QR no longer works. Leaving this page cannot bring this code back; you would have to reissue again.</p>
+  <textarea id="payload" readonly rows="3" class="w-full bg-ink border-2 border-ash p-2 text-xs break-all select-all">{{ payload }}</textarea>
+  <a href="{% url 'ops:orders' %}" class="inline-block border-2 border-bone px-4 py-2 text-xs uppercase tracking-widest hover:bg-bone hover:text-ink">Done &mdash; back to orders</a>
+</div>
+{% endblock %}
+{% block scripts %}
+{% load static %}
+{% if vendor.qrcode %}<script src="{% static 'store/vendor/qrcode.min.js' %}"></script>{% else %}<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>{% endif %}
+<script>
+  (function () {
+    var text = document.getElementById('payload').value;
+    if (window.QRCode) new QRCode(document.getElementById('qr'), { text: text, width: 256, height: 256, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    else document.getElementById('qr').textContent = 'QR library did not load. Copy the code below instead.';
+  })();
+</script>
+{% endblock %}

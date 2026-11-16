@@ -1,0 +1,244 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% block head %}
+<script>
+  /* Play the "TV on" intro once per visit, on the home page only. Never for reduced-motion visitors or deep links (#checkout). */
+  (function () { try {
+    if (location.pathname !== '/' || location.hash || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (sessionStorage.getItem('clbr-intro')) return;
+    sessionStorage.setItem('clbr-intro', '1');
+    document.documentElement.classList.add('intro');
+  } catch (e) {} })();
+</script>
+{% endblock %}
+{% block body %}
+<div id="intro" aria-hidden="true"><div class="tv"><img src="{% static 'store/img/logo-crosshair.png' %}" alt="" width="640" height="640"></div><div class="snow"></div><div class="lines"></div></div>
+{% include "store/_nav.html" with show_cart=True %}
+<header class="border-b-2 border-bone">
+  <div class="overflow-hidden bg-bone text-ink border-t-2 border-bone -rotate-[0.6deg] scale-[1.02]" aria-hidden="true">
+    <div class="tape flex w-max whitespace-nowrap py-1 text-xs font-bold uppercase tracking-[0.3em]">
+      {% for i in "xxxxxxxxxxxxxxxx" %}<span class="px-6">CLBR WEAR CO. <span class="text-blood">///</span> COD ONLY <span class="text-blood">///</span> NO RESTOCK</span>{% endfor %}
+    </div>
+  </div>
+</header>
+
+{# HERO #}
+<section class="crt-hero relative overflow-hidden border-b-2 border-bone bg-ink" aria-label="CLBR Wear Co.">
+  <div class="absolute inset-0 opacity-30" style="background:radial-gradient(60% 80% at 70% 40%,#e5322d55,transparent 70%)"></div>
+  <img src="{% static 'store/img/logo-crosshair.png' %}" alt="" aria-hidden="true" class="absolute -left-16 top-1/2 -translate-y-1/2 w-[420px] opacity-[0.07] select-none pointer-events-none">
+  <div class="relative max-w-6xl mx-auto px-4 py-8 sm:py-10 grid md:grid-cols-[1fr_340px] gap-10 md:gap-8 items-center">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-blood mb-3">[ Roxas City &middot; Capiz ]</p>
+      <h1 class="font-gothic text-[64px] sm:text-[96px] leading-[.85]">The crosshair<br>doesn&rsquo;t miss</h1>
+      <p class="mt-5 max-w-md text-sm leading-relaxed text-bone/75">Independent streetwear, built in Roxas. Small drops, no restock. Pick your piece, lock in your size, pay cash on delivery. The courier collects the shipping fee at your door.</p>
+      <a href="#drop" class="inline-block mt-6 bg-blood text-ink border-2 border-blood px-6 py-3 uppercase tracking-[0.25em] font-bold text-sm hover:bg-ink hover:text-blood">[ Shop the drop ]</a>
+    </div>
+    <div class="relative mx-auto w-[240px] sm:w-[300px] mb-4 md:mb-0">
+      <div class="absolute -inset-3 bg-bone -rotate-3" aria-hidden="true"></div>
+      <img src="{% static 'store/img/myl-4.jpg' %}" alt="MC Myl wearing the CLBR Cult tee" class="relative w-full aspect-[3/4] object-cover border-2 border-ink rotate-1">
+      <a href="#drop" class="absolute -bottom-6 -right-6 grid place-items-center w-24 h-24 bg-blood text-ink font-bold text-xs uppercase tracking-widest text-center"
+         style="clip-path:polygon(50% 0,60% 18%,80% 8%,78% 30%,100% 35%,84% 52%,98% 72%,76% 75%,74% 98%,56% 84%,38% 100%,34% 78%,10% 86%,20% 62%,0 50%,20% 38%,8% 14%,32% 20%)">Shop</a>
+    </div>
+  </div>
+</section>
+
+<main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_440px]">
+
+  {# CATALOG #}
+  <section id="drop" aria-labelledby="drop-h" class="scroll-mt-20 min-w-0">
+    <h2 id="drop-h" class="text-xs uppercase tracking-[0.3em] text-blood mb-4">[ 01 ] The drop</h2>
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    <noscript><p class="border-2 border-dashed border-bone/40 p-6 text-sm">The shop needs JavaScript to show the drop and take orders. Please turn it on in your browser, or message us on Instagram <a class="underline decoration-blood underline-offset-4" href="{{ instagram_url }}">@clbrwear_co</a> to order.</p></noscript>
+    <p id="empty-note" class="hidden border-2 border-dashed border-ash p-8 text-center text-bone/60">Sold out. Watch the page on Instagram for the next drop.</p>
+  </section>
+
+  {# CHECKOUT #}
+  <aside class="lg:sticky lg:top-4 self-start min-w-0">
+    <div id="checkout" class="scroll-mt-20 border-2 border-bone bg-coal shadow-[6px_6px_0_0_#e5322d]">
+      <div class="border-b-2 border-bone px-4 py-2 text-xs uppercase tracking-[0.3em] text-blood">[ 02 ] Checkout</div>
+
+      <div id="cart-lines" class="px-4 pt-4 text-sm space-y-1"></div>
+      <div class="px-4 py-3 flex justify-between border-b border-ash font-bold">
+        <span class="uppercase tracking-widest text-xs self-center">Total (COD)</span><span id="cart-total">₱0.00</span>
+      </div>
+      <p class="px-4 py-2 text-xs text-bone/60 border-b border-ash">+ Shipping fee, paid to the courier (J&amp;T / LBC) when the parcel arrives.</p>
+
+      <form id="order-form" class="p-4 sm:p-5 space-y-5" novalidate data-url="{% url 'store:create_order' %}">
+        <div>
+          <label for="full_name" class="block text-xs uppercase tracking-[0.2em] text-bone/60 mb-1">Full name</label>
+          <input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="120" required
+                 class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-3 placeholder:text-bone/50" placeholder="Juan Dela Cruz">
+        </div>
+
+        <div>
+          <label for="phone" class="block text-xs uppercase tracking-[0.2em] text-bone/60 mb-1">Phone number</label>
+          <div class="flex">
+            <span class="bg-ash px-3 py-3 border-2 border-r-0 border-ash select-none">+63</span>
+            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="14" required
+                   class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-3 placeholder:text-bone/50" placeholder="917 123 4567">
+          </div>
+        </div>
+
+        <fieldset class="space-y-3">
+          <legend class="text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-2">Delivery address <span class="text-blood">(PH only)</span></legend>
+
+          <button type="button" id="geo-btn"
+                  class="w-full border-2 border-bone px-3 py-3 uppercase tracking-[0.2em] text-xs font-bold hover:bg-bone hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-blood disabled:opacity-50">
+            [ Auto-Locate GPS ]
+          </button>
+          <p id="geo-status" class="text-xs text-bone/60 min-h-[1.25rem]" role="status" aria-live="polite">
+            Tap to fill your barangay, city and province from GPS, then add your house no. / landmark below.
+          </p>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="address" class="text-[11px] uppercase tracking-[0.2em] text-bone/60">Barangay, city, province</label>
+              <span id="addr-count" class="text-xs text-bone/60">0/155</span>
+            </div>
+            <textarea id="address" name="address" rows="3" maxlength="155" autocomplete="address-level2" required
+                      class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-3 resize-none placeholder:text-bone/50"
+                      placeholder="Brgy. Tiza, Roxas City, Capiz"></textarea>
+          </div>
+
+          <div>
+            <label for="address_detail" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">House no. / street / landmark <span class="text-blood">(required)</span></label>
+            <textarea id="address_detail" name="address_detail" rows="2" maxlength="90" autocomplete="address-line1" required
+                      class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-3 resize-none placeholder:text-bone/50"
+                      placeholder="Block 4 Lot 7, green gate beside the sari-sari store"></textarea>
+            <p class="mt-1 text-xs text-bone/60">GPS can&rsquo;t read your house number. The rider uses this line to find you, so be specific.</p>
+          </div>
+        </fieldset>
+
+        <div class="flex items-start gap-3">
+          <input id="consent" name="consent" type="checkbox" required class="mt-0.5 h-6 w-6 accent-[#e5322d] shrink-0">
+          <label for="consent" class="text-xs normal-case tracking-normal text-bone/70 leading-snug">
+            I agree to the <a href="{% url 'store:terms' %}" target="_blank" class="underline decoration-blood underline-offset-2">Terms of Sale</a> and the
+            <a href="{% url 'store:privacy' %}" target="_blank" class="underline decoration-blood underline-offset-2">Privacy Notice</a>, and allow CLBR to use my details to verify and deliver my order.
+          </label>
+        </div>
+
+        {# honeypot: hidden from humans, bots fill it #}
+        <div class="absolute -left-[9999px]" aria-hidden="true">
+          <label>Website <input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <p id="form-error" class="hidden border-2 border-blood bg-blood/10 text-blood px-3 py-2 text-sm whitespace-pre-line" role="alert"></p>
+
+        <button id="submit-btn" type="submit"
+                class="w-full bg-blood text-ink px-3 py-3 uppercase tracking-[0.25em] font-bold border-2 border-blood hover:bg-ink hover:text-blood focus-visible:outline focus-visible:outline-2 focus-visible:outline-bone disabled:opacity-50">
+          [ Generate Order QR ]
+        </button>
+        <p class="text-xs text-bone/60">Press Enter in any field to submit. Cash on delivery &middot; Philippines-wide delivery only. Shipping fee is paid to the courier on delivery, in addition to the item total.</p>
+      </form>
+
+      {# SUCCESS / QR #}
+      <section id="success" class="hidden p-4 space-y-4" aria-live="polite">
+        <div class="flex items-center justify-between">
+          <p class="text-xs uppercase tracking-[0.3em] text-blood">Order logged</p>
+          <p class="text-xs">REF <span id="ref" class="font-bold"></span></p>
+        </div>
+        <div class="bg-white p-4 w-fit mx-auto"><div id="qr"></div></div>
+        <p class="text-center text-sm">Total COD: <strong id="done-total"></strong></p>
+        <p class="text-center text-xs text-bone/60">+ shipping fee, paid to the courier when your parcel arrives.</p>
+        <ol class="text-sm list-decimal pl-5 space-y-1 text-bone/80">
+          <li><strong>Screenshot</strong> this QR (or save it below).</li>
+          <li>Send it to us on <strong>Instagram DM</strong>.</li>
+          <li>We scan it, verify your order, and ship COD.</li>
+        </ol>
+        <p id="hold-note" class="text-xs text-bone/50"></p>
+        <p class="text-xs text-blood">Don&rsquo;t post this QR publicly — it&rsquo;s the proof of your order and works once.</p>
+        <a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer"
+           class="block text-center bg-bone text-ink border-2 border-bone px-3 py-3 uppercase tracking-[0.2em] font-bold hover:bg-ink hover:text-bone">
+          [ Send QR on Instagram → @clbrwear_co ]
+        </a>
+        <div class="flex gap-2">
+          <button id="dl-btn" type="button" class="flex-1 border-2 border-ash px-3 py-2 text-xs uppercase tracking-widest hover:border-bone">Save QR</button>
+          <button id="new-btn" type="button" class="flex-1 border-2 border-ash px-3 py-2 text-xs uppercase tracking-widest hover:border-bone">New order</button>
+        </div>
+      </section>
+    </div>
+  </aside>
+</main>
+
+
+{# FEATURED ARTISTS #}
+<section id="artist" data-reveal class="scroll-mt-14 border-t-2 border-bone bg-coal" aria-labelledby="artist-h">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <p class="text-xs uppercase tracking-[0.3em] text-blood mb-2">[ 03 ] CLBR Crew</p>
+    <h2 id="artist-h" class="font-gothic text-6xl leading-none mb-6">Featured artists</h2>
+    <div class="relative mb-8">
+      <div class="absolute -inset-2 border-2 border-blood translate-x-2 translate-y-2" aria-hidden="true"></div>
+      <img src="{% static 'store/img/artists-banner.jpg' %}" alt="DJ Clark, DJ Rox and MC Myl in CLBR tees" loading="lazy" class="relative w-full max-h-[520px] object-cover object-center border-2 border-bone">
+    </div>
+    <div class="grid sm:grid-cols-3 gap-4 mt-12">
+      {% for a in artists %}
+      <article class="border-2 border-bone bg-ink">
+        <img src="{% static a.image %}" alt="{{ a.name }}" loading="lazy" class="w-full aspect-[3/4] object-cover border-b-2 border-bone">
+        <div class="p-4">
+          <p class="text-xs uppercase tracking-[0.3em] text-blood">{{ a.role }}</p>
+          <h3 class="font-gothic text-4xl leading-none mt-1">{{ a.name }}</h3>
+          {% if a.bio %}<p class="mt-3 text-sm text-bone/75 leading-relaxed">{{ a.bio }}</p>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <a href="{{ artists_instagram }}" target="_blank" rel="noopener noreferrer" class="inline-block mt-6 border-2 border-bone px-5 py-2 uppercase tracking-[0.2em] text-xs font-bold hover:bg-bone hover:text-ink">[ Follow @clbrwear_co ]</a>
+  </div>
+</section>
+
+{# LOOKBOOK #}
+<section id="lookbook" data-reveal class="scroll-mt-14 border-t-2 border-bone" aria-labelledby="look-h">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <p class="text-xs uppercase tracking-[0.3em] text-blood mb-2">[ 04 ] Lookbook</p>
+    <h2 id="look-h" class="font-gothic text-5xl mb-6">On the streets</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {% for img,alt in lookbook %}
+      <img src="{% static img %}" alt="{{ alt }}" loading="lazy" class="w-full aspect-[3/4] object-cover border-2 border-ash hover:border-blood transition">
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# SIZE CHART #}
+<section id="sizes" data-reveal class="scroll-mt-14 border-t-2 border-bone bg-coal" aria-labelledby="size-h">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <p class="text-xs uppercase tracking-[0.3em] text-blood mb-2">[ 05 ] Fit guide</p>
+    <h2 id="size-h" class="font-gothic text-5xl mb-2">Size chart</h2>
+    <p class="text-sm text-bone/70 mb-6 max-w-xl"><strong class="text-bone">Boxy crop fit.</strong> Available in M, L, XL and XXL. Measurements are the garment laid flat, in inches.</p>
+    <div class="overflow-x-auto">
+      <table class="w-full max-w-xl text-sm border-2 border-bone">
+        <thead class="bg-bone text-ink uppercase text-xs tracking-[0.2em]">
+          <tr><th class="text-left p-3">Size</th><th class="p-3">Width</th><th class="p-3">Length</th><th class="p-3">Sleeve</th></tr>
+        </thead>
+        <tbody>
+          {% for size,width,length,sleeve in size_chart %}
+          <tr class="border-t border-ash text-center"><th class="text-left p-3 font-bold">{{ size }}</th><td class="p-3">{{ width }} {{ size_unit }}</td><td class="p-3">{{ length }} {{ size_unit }}</td><td class="p-3">{{ sleeve }} {{ size_unit }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if size_chart_draft %}<p class="mt-3 text-xs text-blood uppercase tracking-widest">&#9888; Draft: confirm measurements before launch (settings.SIZE_CHART)</p>{% endif %}
+  </div>
+</section>
+
+{% include 'store/_footer.html' %}
+
+{# Phone-only cart bar: shows once something is in the cart; hides while the checkout form is on screen. #}
+<div id="cart-bar" class="hidden lg:hidden fixed inset-x-0 bottom-0 z-40 border-t-2 border-bone bg-ink px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+  <a href="#checkout" class="flex items-center justify-between gap-3 bg-blood text-ink border-2 border-blood px-4 py-3 text-sm font-bold uppercase tracking-[0.12em] active:bg-ink active:text-blood">
+    <span><span id="cart-bar-count">0</span> in cart &middot; <span id="cart-bar-total"></span></span>
+    <span>Checkout &darr;</span>
+  </a>
+</div>
+
+{{ products_json|json_script:"product-data" }}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"{{ site.name }}","url":"{{ request.scheme }}://{{ request.get_host }}/","email":"{{ site.email }}","telephone":"{{ site.phone }}","sameAs":["{{ site.instagram }}"],"address":{"@type":"PostalAddress","addressLocality":"Roxas City","addressRegion":"Capiz","addressCountry":"PH"}}</script>
+{% endblock %}
+
+{% block scripts %}
+{% if vendor.qrcode %}<script src="{% static 'store/vendor/qrcode.min.js' %}"></script>{% else %}<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>{% endif %}
+<script>window.CLBR = { maxQty: {{ max_qty }} };</script>
+<script src="{% static 'store/js/checkout.js' %}"></script>
+<script src="{% static 'store/js/reveal.js' %}" defer></script>
+<script src="{% static 'store/js/intro.js' %}" defer></script>
+{% endblock %}

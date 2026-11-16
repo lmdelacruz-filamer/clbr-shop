@@ -1,0 +1,6 @@
+Django>=5.1,<5.3
+psycopg[binary]>=3.1
+Pillow>=10.0
+gunicorn>=22.0
+redis>=5.0
+# django-axes>=6.0   (brute-force lockout for the staff login)

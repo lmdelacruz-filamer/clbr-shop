@@ -1,0 +1,25 @@
+{$DOMAIN} {
+	encode gzip zstd
+	request_body {
+		max_size 12MB
+	}
+	header X-Content-Type-Options nosniff
+
+	handle_path /static/* {
+		root * /srv/static
+		header Cache-Control "public, max-age=86400"
+		file_server
+	}
+
+	handle_path /media/* {
+		root * /srv/media
+		header Cache-Control "public, max-age=86400"
+		file_server
+	}
+
+	handle {
+		reverse_proxy web:8000 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+}

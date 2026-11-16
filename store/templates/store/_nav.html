@@ -1,0 +1,50 @@
+{# Sticky top bar. show_cart=True only on the shop page (the cart lives there). #}
+<nav class="sticky top-0 z-50 bg-ink/95 backdrop-blur border-b-2 border-bone" aria-label="Main">
+  <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+    <a href="{% url 'store:shop' %}" class="font-gothic text-4xl leading-none tracking-wide hover:text-blood" aria-label="CLBR home">CLBR</a>
+
+    <ul class="hidden md:flex items-center gap-6 text-xs uppercase tracking-[0.2em]">
+      <li><a class="hover:text-blood" href="{% url 'store:shop' %}#drop">The drop</a></li>
+      <li><a class="hover:text-blood" href="{% url 'store:shop' %}#artist">Crew</a></li>
+      <li><a class="hover:text-blood" href="{% url 'store:shop' %}#lookbook">Lookbook</a></li>
+      {% if radio_live %}<li><a class="hover:text-blood" href="{% url 'store:radio' %}">Radio</a></li>{% endif %}
+      <li><a class="hover:text-blood" href="{% url 'store:shop' %}#sizes">Size chart</a></li>
+      <li><a class="hover:text-blood" href="{% url 'store:contact' %}">Contact</a></li>
+    </ul>
+
+    <div class="flex items-center gap-2">
+      {% if show_cart %}
+      <a href="#checkout" class="h-10 px-3 border-2 border-bone flex items-center text-xs font-bold uppercase tracking-widest hover:bg-bone hover:text-ink" aria-label="Cart and checkout">
+        Cart <span id="nav-cart-count" class="ml-2 min-w-[1.25rem] text-center bg-blood text-ink px-1 font-bold">0</span>
+      </a>
+      {% endif %}
+      <button id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"
+              class="md:hidden w-11 h-10 border-2 border-bone grid place-items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-blood">
+        <span class="block w-5 space-y-1" aria-hidden="true"><span class="block h-0.5 bg-bone"></span><span class="block h-0.5 bg-bone"></span><span class="block h-0.5 bg-bone"></span></span>
+      </button>
+    </div>
+  </div>
+
+  <div id="menu" class="hidden md:hidden border-t-2 border-bone bg-ink">
+    <ul class="max-w-6xl mx-auto px-4 text-sm font-bold uppercase tracking-[0.2em] divide-y divide-ash">
+      <li><a class="block py-4" href="{% url 'store:shop' %}#drop">The drop</a></li>
+      {% if show_cart %}<li><a class="block py-4 text-blood" href="#checkout">Checkout</a></li>{% endif %}
+      <li><a class="block py-4" href="{% url 'store:shop' %}#artist">Featured artists</a></li>
+      {% if radio_live %}<li><a class="block py-4" href="{% url 'store:radio' %}">CLBR Radio</a></li>{% endif %}
+      <li><a class="block py-4" href="{% url 'store:shop' %}#lookbook">Lookbook</a></li>
+      <li><a class="block py-4" href="{% url 'store:shop' %}#sizes">Size chart</a></li>
+      <li><a class="block py-4" href="{% url 'store:shipping' %}">Shipping &amp; returns</a></li>
+      <li><a class="block py-4" href="{% url 'store:contact' %}">Contact &amp; order help</a></li>
+    </ul>
+  </div>
+</nav>
+<script>
+  (function () {
+    var btn = document.getElementById('menu-btn'), menu = document.getElementById('menu');
+    if (!btn || !menu) return;
+    function set(open) { menu.classList.toggle('hidden', !open); btn.setAttribute('aria-expanded', String(open)); btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
+    btn.addEventListener('click', function () { set(menu.classList.contains('hidden')); });
+    menu.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+  })();
+</script>

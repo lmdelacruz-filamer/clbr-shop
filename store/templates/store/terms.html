@@ -1,0 +1,47 @@
+{% extends "store/page.html" %}
+{% block title %}Terms of Sale | CLBR WEAR CO.{% endblock %}
+{% block description %}Terms of sale for orders placed with CLBR Wear Co., including cash on delivery, QR order verification and order holds.{% endblock %}
+{% block kicker %}Legal{% endblock %}
+{% block heading %}Terms of Sale{% endblock %}
+{% block draft %}{% if policies_draft %}<p class="mb-6 border-2 border-blood bg-blood/10 text-blood px-3 py-2 text-xs uppercase tracking-widest">&#9888; Draft terms: sample wording. Confirm them in settings.POLICIES, then set POLICIES_CONFIRMED = True.</p>{% endif %}{% endblock %}
+{% block content %}
+<p>These terms apply to every order placed through this website with <strong>{{ site.name }}</strong> ("we", "us"), based in {{ site.city }}. By placing an order you confirm that you have read and accepted them and our <a href="{% url 'store:privacy' %}">Privacy Notice</a>.</p>
+
+<h2>1. Who can order</h2>
+<p>You must be at least 18, or have a parent or guardian's permission, and provide a real name, a working Philippine mobile number and a correct delivery address inside the Philippines.</p>
+
+<h2>2. Prices &amp; payment</h2>
+<p>All prices are in Philippine pesos (PHP). Payment is <strong>cash on delivery</strong> to the courier. The total shown at checkout is the item total only. The shipping fee is {{ policies.shipping_fee }}.</p>
+
+<h2>3. How an order is confirmed</h2>
+<ul>
+  <li>Submitting the checkout form <strong>reserves</strong> your items and creates a unique order QR code. It is not yet a confirmed order.</li>
+  <li>You must send the QR code to us on Instagram. We scan it to check it is genuine and unused, then confirm the order with you.</li>
+  <li>Each QR code works <strong>once</strong>. Do not post or share it publicly, because anyone holding it could try to claim your order. We are not responsible for orders claimed with a QR code you shared.</li>
+  <li>We may refuse or cancel an order if we cannot verify it, the details look false, or the item cannot be supplied. If we cancel, nothing is charged.</li>
+</ul>
+
+<h2>4. Stock &amp; holds</h2>
+<p>Stock is limited per size and we do not restock sold-out drops. Reserved items are held for <strong>{{ hold_hours }} hours</strong>. If an order is not verified within that time it expires automatically and the items go back on sale. To keep availability fair, one phone number can hold only a few unverified orders at once.</p>
+
+<h2>5. Delivery</h2>
+<p>See <a href="{% url 'store:shipping' %}">Shipping &amp; Returns</a>. Delivery times are estimates. Risk of loss passes to you when the courier hands you the parcel.</p>
+
+<h2>6. Returns &amp; refused parcels</h2>
+<p>Our return rules are on the <a href="{% url 'store:shipping' %}">Shipping &amp; Returns</a> page. If you refuse a COD parcel without a valid reason, we may decline future orders from the same name, phone number or address.</p>
+
+<h2>7. Product information</h2>
+<p>We try to show colours and prints accurately, but screens differ. Measurements on the size chart are of the garment laid flat and may vary by about 1 inch.</p>
+
+<h2>8. Intellectual property</h2>
+<p>The CLBR name, logos, designs and photos on this site belong to {{ site.name }} and may not be copied or used without our written permission.</p>
+
+<h2>9. Liability</h2>
+<p>To the extent allowed by law, our liability for any order is limited to the price of the items in that order. Nothing here limits your rights under Philippine consumer law, including Republic Act No. 7394 (Consumer Act of the Philippines).</p>
+
+<h2>10. Changes &amp; governing law</h2>
+<p>We may update these terms; the version on this page when you order applies to that order. These terms are governed by the laws of the Republic of the Philippines.</p>
+
+<h2>Contact</h2>
+<p><a href="mailto:{{ site.email }}">{{ site.email }}</a> &middot; {{ site.phone }} &middot; {{ site.city }}</p>
+{% endblock %}

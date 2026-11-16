@@ -1,0 +1,38 @@
+{% extends "store/page.html" %}
+{% block title %}Shipping &amp; Returns | CLBR WEAR CO.{% endblock %}
+{% block description %}Delivery areas, cash on delivery, shipping fees and return policy for CLBR Wear Co. orders in the Philippines.{% endblock %}
+{% block kicker %}Policy{% endblock %}
+{% block heading %}Shipping &amp; Returns{% endblock %}
+{% block draft %}{% if policies_draft %}<p class="mb-6 border-2 border-blood bg-blood/10 text-blood px-3 py-2 text-xs uppercase tracking-widest">&#9888; Draft terms: sample wording. Confirm them in settings.POLICIES, then set POLICIES_CONFIRMED = True.</p>{% endif %}{% endblock %}
+{% block content %}
+<h2>Where we deliver</h2>
+<p>We deliver within the <strong>Philippines only</strong>. We do not ship overseas. Orders with a delivery address or GPS pin outside the Philippines are rejected.</p>
+
+<h2>How ordering works</h2>
+<ul>
+  <li>Choose your piece and size, then fill in your name, mobile number and delivery address. You can use <em>Auto-Locate GPS</em> to fill the address, and edit it yourself.</li>
+  <li>You receive an order QR code. Screenshot it and send it to us on <a href="{{ site.instagram }}" target="_blank" rel="noopener noreferrer">Instagram {{ site.instagram_handle }}</a>.</li>
+  <li>We scan the QR to verify your order, confirm the details with you, then ship.</li>
+  <li>Your items are held for <strong>{{ hold_hours }} hours</strong>. If we have not verified the order by then, it expires and the stock is released.</li>
+</ul>
+
+<h2>Cash on delivery (COD)</h2>
+<p>You pay in cash to the courier when the parcel arrives at your door: the <strong>item price (the COD amount)</strong> <strong>plus the courier's shipping fee</strong>, which the courier collects from you on delivery. Please keep your phone on and have enough cash ready for both. Parcels that are refused without a valid reason may affect your ability to order again.</p>
+
+<h2>Delivery time &amp; shipping fee</h2>
+<ul>
+  <li>Delivery takes {{ policies.delivery_time }}. Times are estimates and can be delayed by weather, holidays or courier backlogs.</li>
+  <li>The shipping fee is {{ policies.shipping_fee }}.</li>
+</ul>
+
+<h2>Returns &amp; exchanges</h2>
+<ul>
+  <li>Because every drop is small, we do not restock. Please check the <a href="/#sizes">size chart</a> before ordering.</li>
+  <li>If your item arrives <strong>damaged, defective or not what you ordered</strong>, message us within <strong>{{ policies.return_window_days }} days of delivery</strong> on Instagram or at <a href="mailto:{{ site.email }}">{{ site.email }}</a>. An unboxing video or clear photos help us sort it out quickly.</li>
+  <li>Items must be unworn, unwashed and have their tags. We do not accept returns for change of mind or wrong size picked by the buyer, but we will help where we can.</li>
+  <li>Approved cases are replaced with the same item when stock allows, otherwise refunded.</li>
+</ul>
+
+<h2>Questions</h2>
+<p>Message <a href="{{ site.instagram }}" target="_blank" rel="noopener noreferrer">{{ site.instagram_handle }}</a> or email <a href="mailto:{{ site.email }}">{{ site.email }}</a>.</p>
+{% endblock %}

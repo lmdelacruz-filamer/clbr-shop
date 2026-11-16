@@ -1,0 +1,42 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% block meta %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block seo %}{% endblock %}
+{% block title %}OPS // Order verification{% endblock %}
+{% block body %}
+{% include "store/ops/_ops_header.html" with nav="scan" %}
+
+<main id="ops" class="max-w-3xl mx-auto px-4 py-6 space-y-6"
+      data-lookup-url="{% url 'ops:lookup' %}" data-confirm-url="{% url 'ops:confirm' %}">
+
+  <section class="border-2 border-bone bg-coal shadow-[6px_6px_0_0_#e5322d]">
+    <div class="border-b-2 border-bone px-4 py-2 text-xs uppercase tracking-[0.3em] text-blood">[ A ] Scan QR</div>
+    <div class="p-4 space-y-3">
+      <div id="reader" class="w-full max-w-sm mx-auto bg-ink border-2 border-ash min-h-[80px]"></div>
+      <button id="cam-btn" type="button" class="w-full border-2 border-bone px-3 py-3 text-xs font-bold uppercase tracking-[0.2em] hover:bg-bone hover:text-ink">[ Start camera ]</button>
+
+      <label id="drop-zone" class="block cursor-pointer text-center border-2 border-dashed border-bone/40 px-4 py-6 hover:border-bone focus-within:border-blood transition">
+        <span class="block text-xs font-bold uppercase tracking-[0.2em]">Drop the customer&rsquo;s QR photo here</span>
+        <span class="block mt-2 text-xs text-bone/60">Drag a screenshot or photo onto this box, tap to choose a file, or press <kbd class="border border-bone/40 px-1">Ctrl</kbd>+<kbd class="border border-bone/40 px-1">V</kbd> to paste a copied image.</span>
+        <input id="file-input" type="file" accept="image/*" class="sr-only">
+      </label>
+
+      <div class="pt-3 border-t border-ash">
+        <label for="manual" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">[ B ] Manual — paste code / token</label>
+        <form id="manual-form" class="flex gap-2">
+          <input id="manual" type="text" autocomplete="off" spellcheck="false" maxlength="200"
+                 class="flex-1 min-w-0 bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50" placeholder="CLBR1:…">
+          <button class="bg-blood text-ink border-2 border-blood px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-ink hover:text-blood">Check</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="result" aria-live="polite" class="space-y-4"></section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{% if vendor.html5qr %}<script src="{% static 'store/vendor/html5-qrcode.min.js' %}"></script>{% else %}<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>{% endif %}
+<script src="{% static 'store/js/ops_scanner.js' %}"></script>
+{% endblock %}

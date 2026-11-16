@@ -1,0 +1,27 @@
+{% extends "store/ops/base_ops.html" %}
+{% block title %}OPS // Radio{% endblock %}
+{% block ops_content %}
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+  <h1 class="text-xs uppercase tracking-[0.3em] text-blood">[ Radio ] The mix on your homepage</h1>
+  <a href="{% url 'ops:radio_new' %}" class="bg-blood text-ink border-2 border-blood px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] hover:bg-ink hover:text-blood">+ Add a mixtape</a>
+</div>
+<p class="mb-6 text-sm text-bone/70 max-w-2xl">The audio plays from SoundCloud. Here you only paste the link and type the title, DJ and tracklist. The <strong class="text-bone">newest active</strong> mixtape is the one shown on the site. To change episodes, add a new one.</p>
+{% if live %}
+<p class="mb-4 border-2 border-bone bg-coal px-3 py-2 text-xs uppercase tracking-[0.15em]" role="status">Live on the site: <strong>{{ live.title }}</strong> by {{ live.dj_name }}</p>
+{% else %}
+<p class="mb-4 border-2 border-dashed border-ash px-3 py-2 text-xs uppercase tracking-[0.15em] text-bone/70" role="status">No active mixtape. The Radio section is hidden on the site.</p>
+{% endif %}
+<div class="grid gap-3">
+  {% for m in mixes %}
+  <article class="border-2 border-bone bg-coal p-4 flex flex-wrap items-center justify-between gap-3 {% if not m.is_active %}opacity-60{% endif %}">
+    <div class="min-w-0">
+      <h2 class="font-bold uppercase leading-tight">{{ m.title }}</h2>
+      <p class="text-xs text-bone/70 mt-1">by {{ m.dj_name }} &middot; {{ m.created_at|date:"j M Y" }}{% if not m.is_active %} &middot; <span class="text-blood uppercase tracking-widest">hidden</span>{% endif %}</p>
+    </div>
+    <a href="{% url 'ops:radio_edit' m.pk %}" class="border-2 border-bone px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] hover:bg-bone hover:text-ink">Edit</a>
+  </article>
+  {% empty %}
+  <p class="border-2 border-dashed border-ash p-8 text-center text-bone/60">No mixtapes yet. Add the first one.</p>
+  {% endfor %}
+</div>
+{% endblock %}

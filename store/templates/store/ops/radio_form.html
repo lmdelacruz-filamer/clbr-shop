@@ -1,0 +1,53 @@
+{% extends "store/ops/base_ops.html" %}
+{% block title %}OPS // {% if mix %}Edit{% else %}Add{% endif %} mixtape{% endblock %}
+{% block ops_content %}
+<div class="max-w-2xl">
+  <a href="{% url 'ops:radio' %}" class="text-xs uppercase tracking-widest text-bone/60 hover:text-blood">&larr; Back to radio</a>
+  <h1 class="mt-3 mb-6 text-xs uppercase tracking-[0.3em] text-blood">[ {% if mix %}Edit &ldquo;{{ mix.title }}&rdquo;{% else %}Add a mixtape{% endif %} ]</h1>
+
+  <form method="post" class="border-2 border-bone bg-coal shadow-[6px_6px_0_0_#e5322d] p-5 space-y-6">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="border-2 border-blood bg-blood/10 text-blood px-3 py-2 text-sm" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+
+    <div>
+      <label for="{{ form.title.id_for_label }}" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">Mixtape title</label>
+      <input type="text" name="title" id="{{ form.title.id_for_label }}" value="{{ form.title.value|default_if_none:'' }}" maxlength="120" required
+             class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50">
+      {% for e in form.title.errors %}<p class="text-xs text-blood mt-1">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <label for="{{ form.dj_name.id_for_label }}" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">DJ / mixed by</label>
+      <input type="text" name="dj_name" id="{{ form.dj_name.id_for_label }}" value="{{ form.dj_name.value|default_if_none:'' }}" maxlength="80" required
+             class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50">
+      {% for e in form.dj_name.errors %}<p class="text-xs text-blood mt-1">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <label for="{{ form.soundcloud_url.id_for_label }}" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">SoundCloud link</label>
+      <input type="url" name="soundcloud_url" id="{{ form.soundcloud_url.id_for_label }}" value="{{ form.soundcloud_url.value|default_if_none:'' }}" maxlength="300" required placeholder="https://soundcloud.com/your-name/your-mix"
+             class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50">
+      <p class="text-[11px] text-bone/50 mt-1">On SoundCloud open the mix, tap Share, then Copy link. Extra tracking text after the link is removed automatically.</p>
+      {% for e in form.soundcloud_url.errors %}<p class="text-xs text-blood mt-1">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <label for="{{ form.tracklist.id_for_label }}" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">Tracklist (optional)</label>
+      <textarea name="tracklist" id="{{ form.tracklist.id_for_label }}" rows="10" maxlength="8000" placeholder="0:00 | Artist | Track name&#10;3:24 | Artist | Track name&#10;7:10 | Artist | Track name"
+                class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50 font-mono text-sm">{{ form.tracklist.value|default_if_none:'' }}</textarea>
+      <p class="text-[11px] text-bone/50 mt-1">One track per line: <strong class="text-bone">time | artist | title</strong>. The time is when the track starts in the mix (m:ss or h:mm:ss). The site uses it to show the track that is playing. Please credit every artist. If you leave this empty, the site shows the title SoundCloud reports.</p>
+      {% for e in form.tracklist.errors %}<p class="text-xs text-blood mt-1">{{ e }}</p>{% endfor %}
+    </div>
+
+    <label class="flex items-center gap-2 text-sm">
+      <input type="checkbox" name="is_active" class="h-4 w-4 accent-[#e5322d]" {% if form.is_active.value %}checked{% endif %}>
+      Show this mixtape on the site <span class="text-bone/50 text-xs">(untick to hide it)</span>
+    </label>
+
+    <div class="flex flex-wrap gap-3 pt-2">
+      <button class="bg-blood text-ink border-2 border-blood px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] hover:bg-ink hover:text-blood">{% if mix %}[ Save changes ]{% else %}[ Add mixtape ]{% endif %}</button>
+      <a href="{% url 'ops:radio' %}" class="border-2 border-ash px-6 py-3 text-xs uppercase tracking-[0.2em] hover:border-bone">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

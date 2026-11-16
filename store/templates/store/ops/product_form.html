@@ -1,0 +1,63 @@
+{% extends "store/ops/base_ops.html" %}
+{% block title %}OPS // {% if product %}Edit{% else %}Add{% endif %} shirt{% endblock %}
+{% block ops_content %}
+<div class="max-w-2xl">
+  <a href="{% url 'ops:products' %}" class="text-xs uppercase tracking-widest text-bone/60 hover:text-blood">&larr; Back to products</a>
+  <h1 class="mt-3 mb-6 text-xs uppercase tracking-[0.3em] text-blood">[ {% if product %}Edit &ldquo;{{ product.name }}&rdquo;{% else %}Add a new shirt{% endif %} ]</h1>
+
+  <form method="post" enctype="multipart/form-data" class="border-2 border-bone bg-coal shadow-[6px_6px_0_0_#e5322d] p-5 space-y-6">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="border-2 border-blood bg-blood/10 text-blood px-3 py-2 text-sm" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+
+    <div>
+      <label for="{{ form.name.id_for_label }}" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">Shirt name</label>
+      <input type="text" name="name" id="{{ form.name.id_for_label }}" value="{{ form.name.value|default_if_none:'' }}" maxlength="120" required placeholder="e.g. CULT TEE"
+             class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50">
+      {% for e in form.name.errors %}<p class="text-xs text-blood mt-1">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <label for="{{ form.price.id_for_label }}" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">Price (&#8369;)</label>
+      <input type="number" step="0.01" min="1" name="price" id="{{ form.price.id_for_label }}" value="{{ form.price.value|default_if_none:'' }}" required placeholder="750"
+             class="w-40 bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50">
+      {% for e in form.price.errors %}<p class="text-xs text-blood mt-1">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <label for="{{ form.image.id_for_label }}" class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">Photo {% if product %}(leave empty to keep the current one){% else %}(required){% endif %}</label>
+      {% if product and product.image %}<img src="{{ product.image.url }}" alt="Current photo" class="w-32 h-32 object-cover border-2 border-ash mb-2">{% endif %}
+      <input type="file" name="image" id="{{ form.image.id_for_label }}" accept="image/jpeg,image/png,image/webp"
+             class="block w-full text-sm file:mr-3 file:border-2 file:border-bone file:bg-ink file:text-bone file:px-3 file:py-2 file:uppercase file:tracking-widest file:text-xs hover:file:bg-bone hover:file:text-ink">
+      <p class="text-[11px] text-bone/50 mt-1">JPG, PNG or WEBP, up to 8 MB. It is resized automatically and location data in the photo is removed.</p>
+      {% for e in form.image.errors %}<p class="text-xs text-blood mt-1">{{ e }}</p>{% endfor %}
+    </div>
+
+    <fieldset>
+      <legend class="block text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-1">Sizes &amp; stock</legend>
+      <p class="text-xs text-bone/60 mb-3">Type how many you have <strong class="text-bone">for each size you sell</strong>. Put <strong class="text-bone">0</strong> if it is sold out. <strong class="text-bone">Leave the box empty</strong> if you do not sell that size. Use <em>ONE SIZE</em> for caps.</p>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        {% for size, field, orig in form.size_fields %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="block text-center text-xs font-bold mb-1">{{ size }}</label>
+          <input type="hidden" name="orig_{{ field.html_name }}" value="{{ orig }}">
+          <input type="number" min="0" max="9999" inputmode="numeric" name="{{ field.html_name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" placeholder="not sold"
+                 class="w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-2 py-2 text-center placeholder:text-bone/50 placeholder:text-[11px]">
+          {% for e in field.errors %}<p class="text-[11px] text-blood mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      {% if form.extra_sizes %}<p class="mt-3 text-xs text-bone/60">Also on this product (edit in the Django admin &rarr; Product sizes): {{ form.extra_sizes|join:", " }}</p>{% endif %}
+    </fieldset>
+
+    <label class="flex items-center gap-2 text-sm">
+      <input type="checkbox" name="is_active" class="h-4 w-4 accent-[#e5322d]" {% if form.is_active.value %}checked{% endif %}>
+      Show this shirt in the shop <span class="text-bone/50 text-xs">(untick to hide it without deleting)</span>
+    </label>
+
+    <div class="flex flex-wrap gap-3 pt-2">
+      <button class="bg-blood text-ink border-2 border-blood px-6 py-3 text-xs font-bold uppercase tracking-[0.25em] hover:bg-ink hover:text-blood">{% if product %}[ Save changes ]{% else %}[ Add to shop ]{% endif %}</button>
+      <a href="{% url 'ops:products' %}" class="border-2 border-ash px-6 py-3 text-xs uppercase tracking-[0.2em] hover:border-bone">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

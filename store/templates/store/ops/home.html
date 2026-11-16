@@ -1,0 +1,35 @@
+{% extends "store/ops/base_ops.html" %}
+{% load static %}
+{% block title %}OPS // Home{% endblock %}
+{% block ops_content %}
+<h1 class="text-xs uppercase tracking-[0.3em] text-blood mb-4">[ Home ] What needs attention</h1>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+  <a href="{% url 'ops:orders' %}?tab=pending" class="border-2 border-bone bg-coal p-4 hover:bg-bone hover:text-ink"><p class="text-3xl font-bold {% if pending_count %}text-blood{% endif %}">{{ pending_count }}</p><p class="text-[11px] uppercase tracking-widest mt-1">Waiting to be scanned</p></a>
+  <a href="{% url 'ops:orders' %}?tab=scanned" class="border-2 border-bone bg-coal p-4 hover:bg-bone hover:text-ink"><p class="text-3xl font-bold">{{ to_ship }}</p><p class="text-[11px] uppercase tracking-widest mt-1">Verified, ready to ship</p></a>
+  <a href="{% url 'ops:orders' %}?tab=shipped" class="border-2 border-bone bg-coal p-4 hover:bg-bone hover:text-ink"><p class="text-3xl font-bold">{{ in_transit }}</p><p class="text-[11px] uppercase tracking-widest mt-1">With courier</p></a>
+  <div class="border-2 border-ash bg-coal p-4"><p class="text-3xl font-bold">{{ today }}</p><p class="text-[11px] uppercase tracking-widest mt-1">Orders placed today</p></div>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <section>
+    <h2 class="text-xs uppercase tracking-[0.25em] mb-1">Low or sold-out sizes</h2>
+    <p class="text-[11px] text-bone/50 mb-3">{{ low_at }} or fewer left</p>
+    <ul class="border-2 border-bone divide-y divide-ash">
+      {% for r in low %}
+      <li class="p-3 flex items-center justify-between gap-3 text-sm"><span>{{ r.product.name }} <strong>({{ r.size }})</strong></span>
+        <span class="flex items-center gap-3"><span class="font-bold {% if r.stock_quantity == 0 %}text-blood{% endif %}">{% if r.stock_quantity == 0 %}SOLD OUT{% else %}{{ r.stock_quantity }} left{% endif %}</span><a class="text-xs underline decoration-blood underline-offset-4" href="{% url 'ops:product_edit' r.product.pk %}">Restock</a></span></li>
+      {% empty %}<li class="p-4 text-sm text-bone/60">All sizes are comfortably stocked.</li>{% endfor %}
+    </ul>
+  </section>
+  <section>
+    <h2 class="text-xs uppercase tracking-[0.25em] mb-1">Parcels with couriers</h2>
+    <p class="text-[11px] text-bone/50 mb-3">COD to be collected by couriers (items only): <strong class="text-bone">&#8369;{{ cod_out }}</strong>. Oldest first. Check the courier's tracking, then close each one as Delivered or Returned.</p>
+    <ul class="border-2 border-bone divide-y divide-ash">
+      {% for o in transit %}
+      <li class="p-3 text-sm flex flex-wrap items-center justify-between gap-2"><span><strong>{{ o.full_name }}</strong> <span class="text-bone/50">REF {{ o.short_ref }}</span><br><span class="text-xs text-bone/60">{{ o.get_courier_display|default:"Courier not set" }}{% if o.tracking_number %} &middot; {{ o.tracking_number }}{% endif %}</span></span>
+        <span class="text-xs {% if o.days_out >= 7 %}text-blood font-bold{% else %}text-bone/60{% endif %}">{{ o.days_out }} day{{ o.days_out|pluralize }} since shipped</span></li>
+      {% empty %}<li class="p-4 text-sm text-bone/60">Nothing in transit.</li>{% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

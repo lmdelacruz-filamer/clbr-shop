@@ -1,0 +1,40 @@
+{% extends "store/ops/base_ops.html" %}
+{% block title %}OPS // Products{% endblock %}
+{% block ops_content %}
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+  <h1 class="text-xs uppercase tracking-[0.3em] text-blood">[ Products ] Shirts in your shop</h1>
+  <a href="{% url 'ops:product_new' %}" class="bg-blood text-ink border-2 border-blood px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] hover:bg-ink hover:text-blood">+ Add new shirt</a>
+</div>
+<form method="get" action="{% url 'ops:products' %}" role="search" class="mb-6 flex gap-2">
+  <label for="q" class="sr-only">Search products by name</label>
+  <input id="q" name="q" type="search" value="{{ q }}" maxlength="60" placeholder="Search shirts by name…" autocomplete="off"
+         class="flex-1 min-w-0 bg-ink border-2 border-bone px-3 py-3 text-sm placeholder:text-bone/50 focus:outline-none focus:border-blood">
+  <button class="border-2 border-bone px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] hover:bg-bone hover:text-ink">Search</button>
+  {% if q %}<a href="{% url 'ops:products' %}" class="border-2 border-ash px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] hover:border-bone grid place-items-center">Clear</a>{% endif %}
+</form>
+{% if q %}<p class="mb-4 text-xs uppercase tracking-[0.2em] text-bone/70" role="status">{{ products|length }} of {{ total }} shirt{{ total|pluralize }} match &ldquo;{{ q }}&rdquo;</p>{% endif %}
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {% for p in products %}
+  <article class="border-2 border-bone bg-coal {% if not p.is_active %}opacity-60{% endif %}">
+    <div class="aspect-square bg-ash overflow-hidden border-b-2 border-bone">
+      {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}" loading="lazy" class="w-full h-full object-cover">{% endif %}
+    </div>
+    <div class="p-4 space-y-3">
+      <div class="flex items-start justify-between gap-2">
+        <h2 class="font-bold uppercase leading-tight">{{ p.name }}</h2>
+        <span class="whitespace-nowrap">&#8369;{{ p.price }}</span>
+      </div>
+      {% if not p.is_active %}<p class="text-[11px] uppercase tracking-widest text-blood">Hidden from shop</p>{% endif %}
+      <ul class="flex flex-wrap gap-1.5">
+        {% for r in p.sizes_ordered %}
+        <li class="border-2 px-2 py-1 text-xs font-bold {% if r.stock_quantity == 0 %}border-blood text-blood{% else %}border-ash{% endif %}">{{ r.size }}: {{ r.stock_quantity }}{% if r.stock_quantity == 0 %} sold out{% endif %}</li>
+        {% empty %}<li class="text-xs text-blood">No sizes set</li>{% endfor %}
+      </ul>
+      <a href="{% url 'ops:product_edit' p.pk %}" class="block text-center border-2 border-bone px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] hover:bg-bone hover:text-ink">Edit / restock</a>
+    </div>
+  </article>
+  {% empty %}
+  <p class="sm:col-span-2 lg:col-span-3 border-2 border-dashed border-ash p-8 text-center text-bone/60">{% if q %}No shirt matches &ldquo;{{ q }}&rdquo;. <a class="underline" href="{% url 'ops:products' %}">Show all</a>{% else %}No products yet. Add your first shirt.{% endif %}</p>
+  {% endfor %}
+</div>
+{% endblock %}

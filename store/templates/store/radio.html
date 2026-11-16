@@ -1,0 +1,126 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% block title %}CLBR Radio | CLBR WEAR CO.{% endblock %}
+{% block description %}CLBR Radio: mixes from the CLBR crew, streaming only on this site.{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'store/css/radio.css' %}">{% endblock %}
+{% block body %}
+{% include "store/_nav.html" %}
+<main id="radio" class="rd" data-radio data-hide="{% if radio_hide %}1{% else %}0{% endif %}">
+  <div class="rd-in">
+    <p class="rd-kicker">[ CLBR Radio ]</p>
+    <h1 class="font-gothic rd-h">The sound of CLBR</h1>
+    <p class="rd-lede">Mixes from the crew. Pick one and the player tunes in. Only on this site.</p>
+
+    {% if mixes %}
+    <div class="rd-grid">
+      <section class="rd-col-list" aria-labelledby="rd-list-h">
+        <h2 id="rd-list-h" class="rd-lk">Mixtapes</h2>
+        <ul class="rd-mixes" data-rd="mixes">
+          {% for m in mixes %}
+          <li class="rd-mix" data-id="{{ m.id }}">
+            <button type="button" class="rd-pick" data-rd="pick" data-id="{{ m.id }}" aria-label="Play {{ m.title }} by {{ m.dj }}">
+              <span class="rd-pickicon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>
+              <span class="rd-picktxt"><span class="rd-pt">{{ m.title }}</span><span class="rd-pd">Mix by {{ m.dj }}{% if m.count %} &middot; {{ m.count }} track{{ m.count|pluralize }}{% endif %}</span></span>
+              <span class="rd-pickst" data-rd="pickstate">PLAY</span>
+            </button>
+            <a class="rd-sclink" href="{{ m.url }}" target="_blank" rel="noopener noreferrer">SoundCloud</a>
+          </li>
+          {% endfor %}
+        </ul>
+        <p class="rd-note">Streams from SoundCloud. Nothing loads from SoundCloud until you pick a mix.</p>
+      </section>
+
+      <section class="rd-col-player" aria-label="CLBR player">
+        <div class="rd-empty" data-rd="empty">
+          <p class="rd-freq-s">00.0<small>FM</small></p>
+          <p>Pick a mixtape and the CLBR player appears here.</p>
+        </div>
+
+        <div class="rd-card" id="rd-card" data-rd="card" hidden>
+          <div class="rd-top">
+            <span class="rd-air"><span class="rd-dot" aria-hidden="true"></span><span data-rd="state">OFF AIR</span></span>
+            <span class="rd-fm">CLBR FM 00.0</span>
+          </div>
+
+          <div class="rd-screen" data-rd="screen">
+            <div class="rd-scene rd-s1 act" aria-hidden="true"><div class="rd-ring rd-ring-a"></div><div class="rd-ring rd-ring-b"></div><img class="rd-logo" src="{% static 'store/img/logo-crosshair.png' %}" alt="" width="170" height="170"></div>
+            <div class="rd-scene rd-s2" aria-hidden="true"><img class="rd-logo rd-w" src="{% static 'store/img/logo-crosshair.png' %}" alt="" width="170" height="170"><img class="rd-logo rd-r" src="{% static 'store/img/logo-crosshair.png' %}" alt="" width="170" height="170"></div>
+            <div class="rd-scene rd-s3" aria-hidden="true"><div class="rd-freq">00.0<small>FM</small></div><div class="rd-only">ONLY ON THIS SITE</div><div class="rd-dial"><div class="rd-needle"></div></div></div>
+            <div class="rd-scene rd-s4" aria-hidden="true">{% for i in "xxxxxxxxxxxxxxxxxxxxxxxxxx" %}<i style="--d:{{ forloop.counter0 }}"></i>{% endfor %}</div>
+            <div class="rd-grain" aria-hidden="true"></div><div class="rd-scan" aria-hidden="true"></div><div class="rd-snow" aria-hidden="true"></div>
+            <p class="rd-tag" aria-hidden="true">CLBR FM 00.0 &middot; ONLY ON THIS SITE</p>
+            <button type="button" class="rd-fsbtn" data-rd="fs-open" aria-label="Open fullscreen view">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            </button>
+          </div>
+
+          <div class="rd-body">
+            <div class="rd-info" aria-live="polite">
+              <p class="rd-np">Now playing &middot; <span data-rd="pos">0:00</span></p>
+              <p class="rd-tt" data-rd="title">&nbsp;</p>
+              <p class="rd-ar" data-rd="artist">&nbsp;</p>
+              <p class="rd-dj" data-rd="dj">&nbsp;</p>
+            </div>
+            <div class="rd-seekwrap">
+              <label class="sr-only" for="rd-seek">Seek through the mix</label>
+              <input type="range" id="rd-seek" class="rd-seek" data-rd="seek" min="0" max="100" step="1" value="0" disabled aria-valuetext="0:00">
+              <p class="rd-tm" aria-hidden="true"><span data-rd="pos2">0:00</span><span data-rd="dur">--:--</span></p>
+            </div>
+            <div class="rd-ctl">
+              <button type="button" class="rd-sm" data-rd="back" aria-label="Back 15 seconds" disabled>-15s</button>
+              <button type="button" class="rd-play" data-rd="play" aria-label="Play CLBR Radio">
+                <svg class="i-play" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>
+                <svg class="i-pause" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+              </button>
+              <button type="button" class="rd-sm" data-rd="fwd" aria-label="Forward 15 seconds" disabled>+15s</button>
+            </div>
+            <p class="rd-msg" data-rd="msg" role="status"></p>
+          </div>
+
+          <div class="rd-slot{% if radio_hide %} rd-offscreen{% endif %}" data-rd="slot"></div>
+
+          <div class="rd-list" data-rd="tracklist" hidden>
+            <p class="rd-lk">Tracklist</p>
+            <ol data-rd="list"></ol>
+          </div>
+          <p class="rd-note rd-cardnote"><a data-rd="sclink" href="#" target="_blank" rel="noopener noreferrer">Listen on SoundCloud</a></p>
+        </div>
+      </section>
+    </div>
+    {{ mixes_json|json_script:"rd-data" }}
+    <noscript><p class="rd-note">Turn on JavaScript to play here. Each mixtape above also has its own SoundCloud link.</p></noscript>
+    {% else %}
+    <p class="rd-none">No mixtapes yet. Check back soon.</p>
+    {% endif %}
+  </div>
+
+  <div id="rd-fs" class="rd-fs" role="dialog" aria-modal="true" aria-label="CLBR Radio fullscreen" hidden>
+    <div class="rd-fs-top">
+      <span class="rd-air"><span class="rd-dot" aria-hidden="true"></span><span data-rd="state">OFF AIR</span> &middot; CLBR FM 00.0</span>
+      <button type="button" class="rd-fsbtn rd-fsx" data-rd="fs-close" aria-label="Close fullscreen view">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="rd-screen rd-screen-fs" data-rd="screen"></div>
+    <div class="rd-fs-info">
+      <p class="rd-np">Now playing &middot; <span data-rd="pos">0:00</span></p>
+      <p class="rd-tt" data-rd="title">&nbsp;</p>
+      <p class="rd-ar" data-rd="artist">&nbsp;</p>
+      <p class="rd-dj" data-rd="dj">&nbsp;</p>
+      <label class="sr-only" for="rd-seek-fs">Seek through the mix</label>
+      <input type="range" id="rd-seek-fs" class="rd-seek" data-rd="seek" min="0" max="100" step="1" value="0" disabled aria-valuetext="0:00">
+      <p class="rd-tm" aria-hidden="true"><span data-rd="pos2">0:00</span><span data-rd="dur">--:--</span></p>
+      <div class="rd-fs-ctl">
+        <button type="button" class="rd-sm" data-rd="back" aria-label="Back 15 seconds">-15s</button>
+        <button type="button" class="rd-play" data-rd="play" aria-label="Play CLBR Radio">
+          <svg class="i-play" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>
+          <svg class="i-pause" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+        </button>
+        <button type="button" class="rd-sm" data-rd="fwd" aria-label="Forward 15 seconds">+15s</button>
+      </div>
+    </div>
+  </div>
+</main>
+{% include 'store/_footer.html' %}
+{% endblock %}
+{% block scripts %}{% if mixes %}<script src="{% static 'store/js/radio.js' %}" defer></script>{% endif %}{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "store/page.html" %}
+{% block title %}Privacy Notice | CLBR WEAR CO.{% endblock %}
+{% block description %}How CLBR Wear Co. collects, uses and protects your personal data under the Philippine Data Privacy Act of 2012.{% endblock %}
+{% block kicker %}Legal{% endblock %}
+{% block heading %}Privacy Notice{% endblock %}
+{% block content %}
+<p>{{ site.name }} ("we") respects your privacy. This notice explains what personal data we collect when you order, why, who sees it, and your rights under the <strong>Data Privacy Act of 2012 (Republic Act No. 10173)</strong>.</p>
+
+<h2>What we collect</h2>
+<ul>
+  <li><strong>Order details:</strong> your full name, mobile number, delivery address, and the items, sizes and total you ordered.</li>
+  <li><strong>Location (optional):</strong> if you tap <em>Auto-Locate GPS</em>, your phone's coordinates (latitude and longitude) are used to fill in your address and are saved with your order to help the courier find you.</li>
+  <li><strong>Technical data:</strong> your IP address and basic request data in our server logs, used for security and to stop spam.</li>
+  <li><strong>Proof of consent:</strong> the time you accepted our Terms and this notice.</li>
+</ul>
+
+<h2>Why we use it</h2>
+<ul>
+  <li>To verify, pack and deliver your order, and to contact you about it (including on Instagram).</li>
+  <li>To prevent fraud, duplicate or fake orders.</li>
+  <li>To handle returns, complaints, and our own accounting and legal obligations.</li>
+</ul>
+<p>We do <strong>not</strong> sell your data and we do not use it for advertising.</p>
+
+<h2>Who sees it</h2>
+<ul>
+  <li><strong>Our staff</strong> who verify and ship orders, after logging in to a private dashboard.</li>
+  <li><strong>The courier</strong> ({{ policies.courier }}), who needs your name, number and address to deliver.</li>
+  <li><strong>Our hosting provider</strong>, which stores the data on our behalf.</li>
+  <li><strong>OpenStreetMap (Nominatim)</strong>, only if you use Auto-Locate GPS: your coordinates are sent to its public service to look up a street address. See the <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer">OpenStreetMap privacy policy</a>.</li>
+  <li><strong>SoundCloud</strong>, only if you pick a mix on the CLBR Radio page: the player and its script load from SoundCloud's servers at that moment, so SoundCloud receives your IP address and may set its own cookies, under its <a href="https://soundcloud.com/pages/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a>. Nothing loads from SoundCloud until you pick a mix.</li>
+  <li><strong>Instagram (Meta)</strong>, if you message us there, under its own policy.</li>
+</ul>
+
+<h2>Your order QR code</h2>
+<p>The QR code contains only a random order code, not your name, phone or address. Anyone who holds it could present it as your order, so please do not post it publicly.</p>
+
+<h2>Cookies</h2>
+<p>We use only <strong>strictly necessary</strong> cookies on our own pages (a security token that protects forms against forgery, and a login session for our staff). We use no advertising or analytics cookies. We also remember your latest order QR in your own browser's storage so you do not lose it if you refresh; the "New order" button clears it. Fonts and scripts are served from our own server where possible.</p>
+
+<h2>How long we keep it</h2>
+<p>We keep order records for as long as needed to fulfil the order, handle returns and complaints, and meet accounting and legal requirements, then delete or anonymise them. Server logs are kept for a short period.</p>
+
+<h2>How we protect it</h2>
+<p>The site uses HTTPS, our dashboard is password protected with login rate limits, access is restricted to staff, and order verification codes are stored only as one-way hashes. No system is perfectly secure, but we take reasonable organisational, physical and technical measures.</p>
+
+<h2>Your rights</h2>
+<p>You may ask us to <strong>access, correct or delete</strong> your personal data, object to or limit how we use it, and withdraw your consent, subject to legal limits. You may also complain to the <strong>National Privacy Commission</strong> (<a href="https://privacy.gov.ph" target="_blank" rel="noopener noreferrer">privacy.gov.ph</a>). To use these rights, email <a href="mailto:{{ site.email }}">{{ site.email }}</a> with your name and order details.</p>
+
+<h2>Contact</h2>
+<p>{{ site.name }}, {{ site.city }} &middot; <a href="mailto:{{ site.email }}">{{ site.email }}</a> &middot; {{ site.phone }}</p>
+<p>We may update this notice; the date above shows the latest version.</p>
+{% endblock %}

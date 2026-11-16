@@ -1,0 +1,21 @@
+<header class="border-b-2 border-bone">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-baseline gap-3"><span class="font-gothic text-3xl">CLBR</span><span class="text-xs uppercase tracking-[0.3em] text-blood">OPS</span></div>
+    <form method="post" action="{% url 'ops:logout' %}">{% csrf_token %}
+      <button class="text-xs uppercase tracking-widest border-2 border-ash px-3 py-1 hover:border-bone">Log out ({{ request.user.get_username }})</button>
+    </form>
+  </div>
+  <nav class="max-w-6xl mx-auto px-4 flex gap-2 pb-3 text-xs uppercase tracking-[0.15em] overflow-x-auto whitespace-nowrap" aria-label="Staff menu">
+    <a href="{% url 'ops:home' %}" class="shrink-0 px-3 py-2 border-2 {% if nav == 'home' %}bg-bone text-ink border-bone font-bold{% else %}border-ash hover:border-bone{% endif %}">Home</a>
+    <a href="{% url 'ops:scanner' %}" class="shrink-0 px-3 py-2 border-2 {% if nav == 'scan' %}bg-bone text-ink border-bone font-bold{% else %}border-ash hover:border-bone{% endif %}">Scan QR</a>
+    <a href="{% url 'ops:orders' %}" class="shrink-0 px-3 py-2 border-2 {% if nav == 'orders' %}bg-bone text-ink border-bone font-bold{% else %}border-ash hover:border-bone{% endif %}">Orders{% if pending_count %} <span class="ml-1 bg-blood text-ink px-1.5 font-bold">{{ pending_count }}</span>{% endif %}</a>
+    <a href="{% url 'ops:products' %}" class="shrink-0 px-3 py-2 border-2 {% if nav == 'products' %}bg-bone text-ink border-bone font-bold{% else %}border-ash hover:border-bone{% endif %}">Products</a>
+    <a href="{% url 'ops:radio' %}" class="shrink-0 px-3 py-2 border-2 {% if nav == 'radio' %}bg-bone text-ink border-bone font-bold{% else %}border-ash hover:border-bone{% endif %}">Radio</a>
+    <a href="{% url 'ops:scans' %}" class="shrink-0 px-3 py-2 border-2 {% if nav == 'scans' %}bg-bone text-ink border-bone font-bold{% else %}border-ash hover:border-bone{% endif %}">Scan log</a>
+  </nav>
+</header>
+{% if messages %}
+<div class="max-w-6xl mx-auto px-4 mt-4 space-y-2" role="status">
+  {% for m in messages %}<p class="border-2 px-3 py-2 text-sm {% if m.tags == 'success' %}border-bone bg-bone text-ink font-bold{% else %}border-blood bg-blood/10 text-blood{% endif %}">{{ m }}</p>{% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,24 @@
+{% extends "store/page.html" %}
+{% block title %}Contact &amp; Order Help | CLBR WEAR CO.{% endblock %}
+{% block description %}Contact CLBR Wear Co. in Roxas City, Capiz, and get help with your order QR code, sizes and delivery.{% endblock %}
+{% block kicker %}Contact{% endblock %}
+{% block heading %}Contact &amp; Order help{% endblock %}
+{% block content %}
+<h2>Reach us</h2>
+<ul>
+  <li>Instagram (fastest): <a href="{{ site.instagram }}" target="_blank" rel="noopener noreferrer">{{ site.instagram_handle }}</a></li>
+  <li>Email: <a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+  <li>Phone: <a href="tel:{{ site.phone|cut:' ' }}">{{ site.phone }}</a></li>
+  <li>Facebook: {{ site.facebook_name }}</li>
+  <li>Based in {{ site.city }}</li>
+</ul>
+
+<h2>Order help</h2>
+<ul>
+  <li><strong>I placed an order. What now?</strong> Screenshot your QR code and send it to us on Instagram. We verify it and confirm your delivery details.</li>
+  <li><strong>I lost my QR code.</strong> Message us on Instagram with your name and order details. If your order has not been verified yet, we can issue a new QR and the old one stops working. If we cannot, it will expire after {{ hold_hours }} hours and you can order again.</li>
+  <li><strong>Which size should I get?</strong> See the <a href="/#sizes">size chart</a>. Our tees are a boxy crop fit, in M, L, XL and XXL.</li>
+  <li><strong>Do you ship outside the Philippines?</strong> No, Philippines only.</li>
+</ul>
+<p>See also <a href="{% url 'store:shipping' %}">Shipping &amp; Returns</a>, <a href="{% url 'store:terms' %}">Terms of Sale</a> and <a href="{% url 'store:privacy' %}">Privacy Notice</a>.</p>
+{% endblock %}

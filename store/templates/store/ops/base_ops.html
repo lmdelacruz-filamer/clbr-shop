@@ -1,0 +1,30 @@
+{% extends "store/base.html" %}
+{% block meta %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block seo %}{% endblock %}
+{% block body %}
+{% include "store/ops/_ops_header.html" %}
+<main class="max-w-6xl mx-auto px-4 py-6">
+  {% block ops_content %}{% endblock %}
+</main>
+<script>
+  // Ask "are you sure?" before buttons that change stock or status.
+  document.addEventListener('submit', function (e) {
+    var msg = e.target.getAttribute('data-confirm');
+    if (msg && !window.confirm(msg)) e.preventDefault();
+  });
+  // "Copy courier details": copies the receiver / address / COD text for the J&T or LBC booking.
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]');
+    if (!b) return;
+    var text = b.getAttribute('data-copy'), old = b.textContent;
+    function done() { b.textContent = 'Copied!'; setTimeout(function () { b.textContent = old; }, 1500); }
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+    function fallback() {
+      var t = document.createElement('textarea'); t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select();
+      try { document.execCommand('copy'); done(); } catch (err) { window.prompt('Copy this:', text); }
+      document.body.removeChild(t);
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "store/ops/base_ops.html" %}
+{% block title %}OPS // Orders{% endblock %}
+{% block ops_content %}
+<h1 class="text-xs uppercase tracking-[0.3em] text-blood mb-4">[ Orders ] Who has scanned, who hasn't</h1>
+
+<div class="flex gap-2 mb-4 overflow-x-auto whitespace-nowrap pb-1">
+  {% for t in tabs %}
+  <a href="?tab={{ t.key }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="shrink-0 px-3 py-2 border-2 text-xs uppercase tracking-[0.15em] {% if t.active %}bg-bone text-ink border-bone font-bold{% else %}border-ash hover:border-bone{% endif %}">{{ t.label }} <span class="{% if t.active %}text-ink/60{% else %}text-bone/50{% endif %}">({{ t.count }})</span></a>
+  {% endfor %}
+</div>
+
+<form method="get" class="flex gap-2 mb-6 max-w-lg">
+  <input type="hidden" name="tab" value="{{ tab }}">
+  <input name="q" value="{{ q }}" maxlength="60" placeholder="Name, phone or ref"
+         class="flex-1 min-w-0 bg-ink border-2 border-bone/40 focus:border-blood outline-none px-3 py-2 placeholder:text-bone/50">
+  <button class="bg-blood text-ink border-2 border-blood px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-ink hover:text-blood">Search</button>
+  {% if q %}<a href="?tab={{ tab }}" class="border-2 border-ash px-3 py-2 text-xs uppercase tracking-widest hover:border-bone">Clear</a>{% endif %}
+</form>
+
+{% if tab == 'pending' %}<p class="mb-4 text-xs text-bone/60">These buyers have placed an order but their QR has <strong class="text-bone">not been scanned and confirmed yet</strong>. Unconfirmed orders expire automatically ({{ hold_hours }} h) and return their stock.</p>{% endif %}
+
+<div class="space-y-3">
+  {% for o in page %}
+  <article class="border-2 border-bone bg-coal">
+    <div class="p-4 flex flex-wrap items-start justify-between gap-3">
+      <div class="min-w-0">
+        <p class="font-bold text-base break-words">{{ o.full_name }}</p>
+        <p class="text-xs text-bone/60 mt-1">REF {{ o.short_ref }} &middot; placed {{ o.created_at|date:"M j, g:i A" }}
+          {% if o.hours_left is not None %}&middot; <span class="{% if o.hours_left < 3 %}text-blood{% endif %}">expires in ~{{ o.hours_left }} h</span>{% endif %}</p>
+      </div>
+      <div class="text-right">
+        <span class="inline-block border-2 px-2 py-1 text-[11px] font-bold tracking-widest {{ o.ui_class }}">{{ o.ui_label }}</span>
+        {% if o.verified_at %}<p class="text-[11px] text-bone/60 mt-1">scanned {{ o.verified_at|date:"M j, g:i A" }}{% if o.verified_by %} by {{ o.verified_by.get_username }}{% endif %}</p>{% endif %}
+      </div>
+    </div>
+    <ul class="px-4 text-sm space-y-0.5">
+      {% for i in o.items.all %}<li>{{ i.quantity }} &times; {{ i.product_name }}{% if i.size %} <span class="text-blood font-bold">({{ i.size }})</span>{% endif %}</li>{% endfor %}
+    </ul>
+    <div class="px-4 pb-4 pt-3 flex flex-wrap items-center justify-between gap-3">
+      <p class="text-sm"><strong>&#8369;{{ o.total_amount }}</strong> COD &middot; <a class="underline decoration-blood underline-offset-4" href="tel:{{ o.phone_number }}">{{ o.phone_number }}</a></p>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" data-copy="{{ o.courier_text }}" class="border-2 border-ash px-3 py-1 text-xs uppercase tracking-widest hover:border-bone">Copy courier details</button>
+        {% if o.can_reissue %}<form method="post" action="{% url 'ops:order_action' o.pk 'reissue' %}" data-confirm="Issue a NEW QR? The customer's old QR will stop working right away.">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="border-2 border-ash px-3 py-1 text-xs uppercase tracking-widest hover:border-bone">Lost QR? Reissue</button></form>{% endif %}
+        {% if o.can_complete %}<form method="post" action="{% url 'ops:order_action' o.pk 'complete' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="border-2 border-bone px-3 py-1 text-xs uppercase tracking-widest hover:bg-bone hover:text-ink">Delivered / completed</button></form>{% endif %}
+        {% if o.can_return %}<form method="post" action="{% url 'ops:order_action' o.pk 'return' %}" data-confirm="Parcel came back (refused or undeliverable)? The stock will go back to the shop.">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="border-2 border-blood text-blood px-3 py-1 text-xs uppercase tracking-widest hover:bg-blood hover:text-ink">Returned / refused</button></form>{% endif %}
+        {% if o.can_cancel %}<form method="post" action="{% url 'ops:order_action' o.pk 'cancel' %}" data-confirm="Cancel this order and return its stock?">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="border-2 border-blood text-blood px-3 py-1 text-xs uppercase tracking-widest hover:bg-blood hover:text-ink">Cancel &amp; return stock</button></form>{% endif %}
+      </div>
+    </div>
+    {% if o.courier_label %}<p class="px-4 pb-3 text-sm"><span class="text-bone/60 text-xs uppercase tracking-widest">Courier</span> <strong>{{ o.courier_label }}</strong>{% if o.tracking_number %} &middot; tracking <strong class="select-all">{{ o.tracking_number }}</strong>{% endif %}{% if o.shipped_at %} <span class="text-bone/50 text-xs">(shipped {{ o.shipped_at|date:"M j" }})</span>{% endif %}</p>
+    {% if o.status == 'SHIPPED' and o.track_url %}<p class="px-4 pb-3 flex flex-wrap gap-2"><a href="{{ o.track_url }}" target="_blank" rel="noopener noreferrer" class="border-2 border-bone px-3 py-1 text-xs uppercase tracking-widest hover:bg-bone hover:text-ink">Track parcel &#8599;</a>{% if o.tracking_number %}<button type="button" data-copy="{{ o.tracking_number }}" class="border-2 border-ash px-3 py-1 text-xs uppercase tracking-widest hover:border-bone">Copy tracking no.</button>{% endif %}</p>{% endif %}{% endif %}
+    {% if o.can_ship %}
+    <form method="post" action="{% url 'ops:order_action' o.pk 'ship' %}" class="mx-4 mb-4 border-2 border-ash p-3 flex flex-wrap items-end gap-2">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <label class="text-[11px] uppercase tracking-widest text-bone/60">Courier
+        <select name="courier" required class="block mt-1 bg-ink border-2 border-bone/40 px-2 py-2 text-sm text-bone"><option value="" disabled selected>Choose</option>{% for v, label in couriers %}<option value="{{ v }}">{{ label }}</option>{% endfor %}</select></label>
+      <label class="text-[11px] uppercase tracking-widest text-bone/60 flex-1 min-w-[10rem]">Tracking number
+        <input name="tracking" maxlength="40" autocomplete="off" placeholder="from the courier receipt" class="block mt-1 w-full bg-ink border-2 border-bone/40 focus:border-blood outline-none px-2 py-2 text-sm text-bone placeholder:text-bone/50"></label>
+      <button class="bg-bone text-ink border-2 border-bone px-3 py-2 text-xs font-bold uppercase tracking-widest hover:bg-ink hover:text-bone">Mark shipped</button>
+    </form>
+    {% endif %}
+    <details class="border-t border-ash px-4 py-2 text-sm">
+      <summary class="cursor-pointer text-xs uppercase tracking-widest text-bone/60">Delivery details</summary>
+      <p class="mt-2 break-words">{{ o.address_line }}</p>
+      {% if o.latitude is not None %}<p class="mt-1 text-xs"><a class="underline decoration-blood underline-offset-4" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps?q={{ o.latitude }},{{ o.longitude }}">Open pin in Google Maps</a></p>{% endif %}
+    </details>
+  </article>
+  {% empty %}
+  <p class="border-2 border-dashed border-ash p-8 text-center text-bone/60">No orders here{% if q %} matching &ldquo;{{ q }}&rdquo;{% endif %}.</p>
+  {% endfor %}
+</div>
+
+{% if page.has_other_pages %}
+<nav class="mt-6 flex items-center gap-3 text-xs uppercase tracking-widest" aria-label="Pages">
+  {% if page.has_previous %}<a class="border-2 border-ash px-3 py-2 hover:border-bone" href="?tab={{ tab }}&q={{ q|urlencode }}&page={{ page.previous_page_number }}">&larr; Newer</a>{% endif %}
+  <span class="text-bone/60">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="border-2 border-ash px-3 py-2 hover:border-bone" href="?tab={{ tab }}&q={{ q|urlencode }}&page={{ page.next_page_number }}">Older &rarr;</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "store/base.html" %}
+{% block body %}
+{% include "store/_nav.html" %}
+<main class="max-w-3xl mx-auto px-4 py-10">
+  <p class="text-xs uppercase tracking-[0.3em] text-blood mb-2">[ {% block kicker %}Info{% endblock %} ]</p>
+  <h1 class="font-gothic text-5xl sm:text-6xl leading-none mb-2">{% block heading %}{% endblock %}</h1>
+  <p class="text-[11px] uppercase tracking-[0.2em] text-bone/60 mb-8">Last updated: {% block updated %}November 2026{% endblock %}</p>
+  {% block draft %}{% endblock %}
+  <div class="space-y-5 text-sm leading-relaxed text-bone/85 [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-[0.15em] [&_h2]:text-bone [&_h2]:text-xs [&_h2]:mt-8 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_a]:underline [&_a]:decoration-blood [&_a]:underline-offset-4 [&_a:hover]:text-blood">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+{% include 'store/_footer.html' %}
+{% endblock %}
