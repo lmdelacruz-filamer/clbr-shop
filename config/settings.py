@@ -43,6 +43,13 @@ if not DEBUG and (len(SECRET_KEY) < 40 or SECRET_KEY.upper().startswith(("CHANGE
 _default_hosts = "localhost,127.0.0.1" if DEBUG else ""
 ALLOWED_HOSTS = [h.strip() for h in env("DJANGO_ALLOWED_HOSTS", _default_hosts).split(",") if h.strip()]
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
+# Render (demo hosting) tells the app its own address; allow it automatically.
+_render_host = env("RENDER_EXTERNAL_HOSTNAME")
+if _render_host:
+    if _render_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_render_host)
+    if f"https://{_render_host}" not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(f"https://{_render_host}")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -84,6 +91,19 @@ TEMPLATES = [{
 # --- Database (PostgreSQL; SQLite only for quick local experiments) ---------
 if env("USE_SQLITE") == "1":
     DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+elif env("DATABASE_URL"):
+    # Hosted demo (Render gives one DATABASE_URL instead of separate POSTGRES_* values).
+    from urllib.parse import unquote, urlparse
+    _u = urlparse(env("DATABASE_URL"))
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": _u.path.lstrip("/"),
+        "USER": unquote(_u.username or ""),
+        "PASSWORD": unquote(_u.password or ""),
+        "HOST": _u.hostname or "",
+        "PORT": str(_u.port or 5432),
+        "CONN_MAX_AGE": 60,
+    }}
 else:
     DATABASES = {"default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -123,6 +143,9 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Demo hosting only: let Django itself serve /static/ and /media/ (the full server uses Caddy for this).
+# Leave off (default) on the real DigitalOcean server.
+SERVE_FILES = env("SERVE_FILES", "0") == "1"
 
 # --- Security ---------------------------------------------------------------
 ADMIN_URL = env("DJANGO_ADMIN_URL", "manage-clbr/").strip("/") + "/"     # always exactly one trailing slash

@@ -29,6 +29,9 @@ class Command(BaseCommand):
                 product.image.save(img, ContentFile((IMG / img).read_bytes()), save=False)
                 product.save()
                 made += 1
+            elif not product.image or not product.image.storage.exists(product.image.name):
+                # Photo file is gone (e.g. a hosted demo's disk was wiped on restart): put it back.
+                product.image.save(img, ContentFile((IMG / img).read_bytes()), save=True)
             for size in [x.strip() for x in sizes.split(",")]:
                 ProductSize.objects.get_or_create(product=product, size=size, defaults={"stock_quantity": stock})
         self.stdout.write(self.style.SUCCESS(f"Created {made} product(s). Set the real stock per size in the admin."))

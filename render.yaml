@@ -1,0 +1,36 @@
+# Render "Blueprint" for a TEMPORARY DEMO of CLBR WEAR CO. Delete the service + database when the demo is over.
+services:
+  - type: web
+    name: clbr-shop-demo
+    runtime: python
+    plan: free
+    buildCommand: bash render-build.sh
+    startCommand: bash render-start.sh
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ADMIN_URL
+        value: manage-clbr-demo/
+      - key: BEHIND_PROXY
+        value: "1"
+      - key: SERVE_FILES
+        value: "1"
+      - key: HSTS_SECONDS
+        value: "3600"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clbr-demo-db
+          property: connectionString
+      - key: DEMO_STAFF_USER
+        value: demo-staff
+      - key: DEMO_STAFF_PASSWORD
+        sync: false        # you type this in Render's dashboard; it is never stored in GitHub
+
+databases:
+  - name: clbr-demo-db
+    plan: free

@@ -971,3 +971,63 @@ class RadioOpsTests(TestCase):
     def test_ops_menu_has_radio_tab(self):
         self.client.force_login(self.staff)
         self.assertContains(self.client.get(reverse("ops:home")), reverse("ops:radio"))
+
+
+class DemoHostingTests(TestCase):
+    """Demo-hosting helper (Render). Not used on the real server."""
+
+    def run_cmd(self, **env):
+        import io
+        import os
+        from unittest import mock
+        from django.core.management import call_command
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.dict(os.environ, env, clear=False):
+            call_command("create_demo_staff", stdout=out, stderr=err)
+        return out.getvalue(), err.getvalue()
+
+    def test_no_env_creates_nothing(self):
+        from django.contrib.auth import get_user_model
+        self.run_cmd(DEMO_STAFF_USER="", DEMO_STAFF_PASSWORD="")
+        self.assertEqual(get_user_model().objects.count(), 0)
+
+    def test_short_password_refused(self):
+        from django.contrib.auth import get_user_model
+        _, err = self.run_cmd(DEMO_STAFF_USER="demo", DEMO_STAFF_PASSWORD="short")
+        self.assertIn("12 characters", err)
+        self.assertEqual(get_user_model().objects.count(), 0)
+
+    def test_creates_then_resets_staff_login(self):
+        from django.contrib.auth import get_user_model
+        U = get_user_model()
+        self.run_cmd(DEMO_STAFF_USER="demo-staff", DEMO_STAFF_PASSWORD="first-password-123")
+        u = U.objects.get(username="demo-staff")
+        self.assertTrue(u.is_staff)
+        self.assertTrue(u.check_password("first-password-123"))
+        self.run_cmd(DEMO_STAFF_USER="demo-staff", DEMO_STAFF_PASSWORD="second-password-456")
+        self.assertEqual(U.objects.filter(username="demo-staff").count(), 1)
+        self.assertTrue(U.objects.get(username="demo-staff").check_password("second-password-456"))
+
+
+class SeedRestoresPhotosTests(TestCase):
+    def test_seed_restores_missing_photo(self):
+        import os
+        import shutil
+        import tempfile
+        from django.core.management import call_command
+        from django.test import override_settings
+        from store.models import Product
+        tmp = tempfile.mkdtemp()
+        try:
+            with override_settings(MEDIA_ROOT=tmp):
+                call_command("seed_products")
+                p = Product.objects.get(name="CULT TEE")
+                path = p.image.path
+                self.assertTrue(os.path.exists(path))
+                os.remove(path)
+                call_command("seed_products")
+                p.refresh_from_db()
+                self.assertTrue(os.path.exists(p.image.path))
+                self.assertEqual(Product.objects.count(), 5)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
